@@ -36,8 +36,8 @@ def add_map_features(ax, axes_limits):
     bath_lon = ncbath.variables['lon'][:]
     bath_elev = ncbath.variables['elevation'][:]
 
-    lon_lim = [-100.0, 0]
-    #lon_lim = [-100.0, -10.0]
+    #lon_lim = [-100.0, 0]
+    lon_lim = [-100.0, -10.0]
     lat_lim = [0.0, 60.0]
 
     oklatbath = np.logical_and(bath_lat >= lat_lim[0], bath_lat <= lat_lim[-1])
@@ -86,7 +86,9 @@ def color_landimpact_track(ax, hurr_track, landfall_ind, hurricane_index):
         new_ind = [new_ind[1]]
     elif hurricane_index in [2159]:
         new_ind = [new_ind[0]]
-    elif hurricane_index in [2101, 2177]:
+    elif hurricane_index in [2101, 2195]:
+        new_ind = [new_ind[0], new_ind[-1]]
+    elif hurricane_index in [2177]:
         new_ind = [new_ind[1], new_ind[2]]
     elif hurricane_index in [2161]:
         new_ind = [[26, 27, 28]]
@@ -142,8 +144,8 @@ def main(f, years, ic):
             #ax_lims = [-105, -5, 5, 50]
             #ax_lims = [-105, -5, 2.5, 60]
             # no idea why, but set ymax = 37.7 to get ymax = 50
-            ax_lims = [-100, 0, 10, 37.7]
-            #ax_lims = [-100, -10, 10, 40.32]
+            # ax_lims = [-100, 0, 10, 37.7]
+            ax_lims = [-100, -10, 10, 40.32]
             add_map_features(ax, ax_lims)
             #plt.title(ttl)
 
@@ -155,6 +157,9 @@ def main(f, years, ic):
 
         lat_ind = np.where(data['lat'] != -9999.)
         full_track = subset_dataset(data, lat_ind)
+
+        #if hi == 2224:
+        #if hi == 2195:
 
         # plot full hurricane track
         ax.plot(full_track['lon'], full_track['lat'], c='darkgray', marker='.', markersize=1, alpha=.5,
@@ -190,7 +195,7 @@ def main(f, years, ic):
 
         # plt.savefig(os.path.join(sDir,'landfall_hurricanes', 'hurricanes{}{}.png'.format(hi, hnames[i])), dpi=300)
 
-    plt.savefig(os.path.join(sDir,  'hurricanes2010-2019.png'), dpi=300)
+    plt.savefig(os.path.join(sDir, 'hurricanes2010-2019.png'), dpi=300)
     plt.close()
 
 
