@@ -2,7 +2,7 @@
 
 """
 Author: Lori Garzio on 7/10/2020
-Last modified: 7/16/2020
+Last modified: 8/11/2020
 Creates plot of hurricane tracks, with the 3 days previous to US land impact (continental US + Puerto Rico) colored in
 red. Land impact = landfall values <60 nmile (111 km)
 """
@@ -80,15 +80,20 @@ def color_landimpact_track(ax, hurr_track, landfall_ind, hurricane_index):
             ni.append(index)
 
     # manually fix some hurricane tracks that cross Mexico or the Caribbean before impacting the US
-    if hurricane_index in [2081, 2121, 2130, 2136, 2157, 2171, 2182, 2193, 2200, 2204, 2217]:
+    if hurricane_index in [1944, 1947, 1951, 1952, 1971, 1972, 1975, 1980, 1986, 1989, 2003, 2010, 2022, 2028, 2047,
+                           2050, 2051, 2052, 2071, 2081, 2121, 2130, 2136, 2157, 2171, 2182, 2193, 2200, 2204, 2217]:
         new_ind = [new_ind[-1]]
-    elif hurricane_index in [2148]:
+    elif hurricane_index in [1909, 2017, 2148]:
         new_ind = [new_ind[1]]
-    elif hurricane_index in [2159]:
+    elif hurricane_index in [1918, 1925, 1935, 1942, 1977, 2042, 2159]:
         new_ind = [new_ind[0]]
+    elif hurricane_index in [1978]:
+        new_ind = [new_ind[2], new_ind[3], new_ind[4]]
+    elif hurricane_index in [2000]:
+        new_ind = [new_ind[2], new_ind[3]]
     elif hurricane_index in [2101, 2195]:
         new_ind = [new_ind[0], new_ind[-1]]
-    elif hurricane_index in [2177]:
+    elif hurricane_index in [1988, 2177]:
         new_ind = [new_ind[1], new_ind[2]]
     elif hurricane_index in [2161]:
         new_ind = [[26, 27, 28]]
@@ -124,7 +129,7 @@ def main(f, years, ic):
     sDir = os.path.dirname(f)
     ncfile = xr.open_dataset(f, mask_and_scale=False)
 
-    summary_file = pd.read_csv(os.path.join(sDir, 'summary_northatlantic2010_2019_mod.csv'))
+    summary_file = pd.read_csv(os.path.join(sDir, 'summary_northatlantic2000_2019_mod.csv'))
     if len(years) == 1:
         sf = summary_file[summary_file['year'] == years[0]]
         ttl = str(years[0])
@@ -158,11 +163,8 @@ def main(f, years, ic):
         lat_ind = np.where(data['lat'] != -9999.)
         full_track = subset_dataset(data, lat_ind)
 
-        #if hi == 2224:
-        #if hi == 2195:
-
         # plot full hurricane track
-        ax.plot(full_track['lon'], full_track['lat'], c='darkgray', marker='.', markersize=1, alpha=.5,
+        ax.plot(full_track['lon'], full_track['lat'], c='darkgray', marker='.', markersize=1, alpha=.4,
                 transform=ccrs.PlateCarree())
 
         # the last land fall value is always -9999, convert that to the previous landfall value
@@ -186,21 +188,19 @@ def main(f, years, ic):
                 else:
                     color_landimpact_track(ax, full_track, lf_ind[0][list(land_impact_lon_ind[0])], hi)
 
-                # plt.savefig(os.path.join(sDir, 'landfall_hurricanes', 'hurricanes{}{}.png'.format(hi, hnames[i])), dpi=300)
-                # plt.savefig(os.path.join(sDir, 'hurricanes{}{}.png'.format(hi, hnames[i])),
-                #             dpi=300)
+                # plt.savefig(os.path.join(sDir, 'hurricanes{}{}.png'.format(hi, hnames[i])), dpi=300)
 
         except NameError:
             color_landimpact_track(ax, full_track, lf_ind)
 
-        # plt.savefig(os.path.join(sDir,'landfall_hurricanes', 'hurricanes{}{}.png'.format(hi, hnames[i])), dpi=300)
+        #plt.savefig(os.path.join(sDir, 'hurricanes{}{}.png'.format(hi, hnames[i])), dpi=200)
 
-    plt.savefig(os.path.join(sDir, 'hurricanes2010-2019.png'), dpi=300)
+    plt.savefig(os.path.join(sDir, 'hurricanes2000-2019.png'), dpi=300)
     plt.close()
 
 
 if __name__ == '__main__':
-    fpath = '/Users/lgarzio/Documents/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'
-    yrs = [2010, 2019]  # [2019]  [2010, 2019]
+    fpath = '/Users/lgarzio/Documents/rucool/hurricanes/congress_brief2020/2000_2019/IBTrACS.NA.v04r00.nc'
+    yrs = [2000, 2019]  # [2019]  [2010, 2019]
     impact_country = 'US'  # 'US' 'na'
     main(fpath, yrs, impact_country)

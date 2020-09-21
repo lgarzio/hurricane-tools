@@ -39,12 +39,12 @@ def main(f, years, bsin):
                 storm_summary['year'].append(t0.year)
                 storm_summary['findex'].append(i)
     df = pd.DataFrame(storm_summary)
-    df.to_csv(os.path.join(sDir, 'summary_northatlantic2010_2019.csv'))
+    df.to_csv(os.path.join(sDir, 'summary_northatlantic2000_2019.csv'))
 
 
 if __name__ == '__main__':
-    #fpath = '/Users/lgarzio/Documents/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'  # on local machine
-    fpath = '/home/lgarzio/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'  # on server
-    yrs = [2010, 2019]  # start and end year
+    fpath = '/Users/lgarzio/Documents/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'  # on local machine
+    #fpath = '/home/lgarzio/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'  # on server
+    yrs = [2000, 2019]  # start and end year
     basin = 'NA'
     main(fpath, yrs, basin)
