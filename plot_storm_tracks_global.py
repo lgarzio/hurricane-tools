@@ -9,10 +9,9 @@ Creates plot of global storm tracks
 import numpy as np
 import os
 import cmocean
-import datetime as dt
-import itertools
 import pandas as pd
 import xarray as xr
+import simplekml
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -30,11 +29,12 @@ def add_map_features(ax, axes_limits=None):
         ax.set_extent(axes_limits)
 
     # add bathymetry
-    bath_file = '/home/aristizabal/bathymetry_files/GEBCO_2019.nc'
+    bath_file = '/home/lgarzio/bathymetry_files/gebco_2020_netcdf/GEBCO_2020.nc'
+    #bath_file = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/gebco_2020_netcdf/GEBCO_2020.nc'
     ncbath = xr.open_dataset(bath_file)
-    bath_lat = ncbath.variables['lat'][:]
-    bath_lon = ncbath.variables['lon'][:]
-    bath_elev = ncbath.variables['elevation'][:]
+    bath_lat = ncbath.lat
+    bath_lon = ncbath.lon
+    bath_elev = ncbath.elevation
 
     # lon_lim = [-100.0, -10.0]
     # lat_lim = [0.0, 60.0]
@@ -47,9 +47,10 @@ def add_map_features(ax, axes_limits=None):
     # bath_elevs = bath_elev[oklatbath, :]
     # bath_elevsub = bath_elevs[:, oklonbath]
 
-    lev = np.arange(-9000, 9100, 100)
+    # lev = np.arange(-9000, 9100, 100)
     # ax.contourf(bath_lonsub, bath_latsub, bath_elevsub, lev, cmap=cmocean.cm.topo)
-    ax.contourf(bath_lon, bath_lat, bath_elev, lev, cmap=cmocean.cm.topo)
+    # ax.contourf(bath_lon.values, bath_lat.values, bath_elev.values, lev, cmap=cmocean.cm.topo)
+    ax.pcolormesh(bath_lon.values, bath_lat.values, bath_elev.values, cmap=cmocean.cm.topo)
 
     coast = cfeature.NaturalEarthFeature('physical', 'coastline', '110m')
     ax.add_feature(coast, edgecolor='black', facecolor='none')
@@ -65,7 +66,7 @@ def subset_dataset(data_dict, ind):
     return d
 
 
-def main(f, years):
+def main(f, years, savefile):
     sDir = os.path.dirname(f)
     ncfile = xr.open_dataset(f, mask_and_scale=False)
 
@@ -85,6 +86,8 @@ def main(f, years):
     plt.title(ttl)
     ax.set_global()
 
+    kml = simplekml.Kml()
+
     for i, hi in enumerate(hindex):
         if i == 0:
             # ax_lims = [-180, 180, 90, -90]
@@ -92,6 +95,7 @@ def main(f, years):
             add_map_features(ax)
 
         ncf = ncfile.sel(storm=hi)
+        stm_name = ncf.name.values.tostring().decode('utf-8')
         data = dict(tm=ncf['time'].values,
                     lat=ncf['lat'].values,
                     lon=ncf['lon'].values)
@@ -99,17 +103,27 @@ def main(f, years):
         lat_ind = np.where(data['lat'] != -9999.)
         full_track = subset_dataset(data, lat_ind)
 
+        coords = []
+        for ilon, longitude in enumerate(full_track['lon']):
+            coords.append((longitude, full_track['lat'][ilon]))
+
+        # add the track to the kml file
+        lin = kml.newlinestring(name=stm_name, coords=coords)
+
         # plot full hurricane track
         ax.plot(full_track['lon'], full_track['lat'], c='darkgray', marker='.', markersize=1,
                 transform=ccrs.PlateCarree())
         # ax.plot(full_track['lon'], full_track['lat'], c='cyan', marker='.', markersize=1, transform=ccrs.PlateCarree())
 
-    plt.savefig(os.path.join(sDir, 'global_storms2019.png'), dpi=300)
+    plt.savefig(os.path.join(sDir, '{}.png'.format(savefile)), dpi=300)
     plt.close()
+
+    kml.save(os.path.join(sDir, '{}.kml'.format(savefile)))
 
 
 if __name__ == '__main__':
-    # fpath = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/IBTrACS.last3years.v04r00.nc'
-    fpath = '/home/lgarzio/repo/lgarzio/hurricane-tools/files/IBTrACS.last3years.v04r00.nc'
+    #fpath = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/IBTrACS.last3years.v04r00.nc'
+    fpath = '/home/lgarzio/repo/lgarzio/hurricane-tools/files/IBTrACS.last3years.v04r00.nc'  # on server
     yrs = [2019]  # [2019]  [2010, 2019]
-    main(fpath, yrs)
+    sfilename = 'global_storms2019'
+    main(fpath, yrs, sfilename)
