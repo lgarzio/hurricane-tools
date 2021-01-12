@@ -32,9 +32,11 @@ def add_map_features(ax, axes_limits=None):
     bath_file = '/home/lgarzio/bathymetry_files/gebco_2020_netcdf/GEBCO_2020.nc'
     #bath_file = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/gebco_2020_netcdf/GEBCO_2020.nc'
     ncbath = xr.open_dataset(bath_file)
-    bath_lat = ncbath.lat
-    bath_lon = ncbath.lon
-    bath_elev = ncbath.elevation
+    elev = ncbath.elevation
+
+    # subset every nth point
+    n = 10
+    elev_sub = elev[::n, ::n]
 
     # lon_lim = [-100.0, -10.0]
     # lat_lim = [0.0, 60.0]
@@ -50,7 +52,7 @@ def add_map_features(ax, axes_limits=None):
     # lev = np.arange(-9000, 9100, 100)
     # ax.contourf(bath_lonsub, bath_latsub, bath_elevsub, lev, cmap=cmocean.cm.topo)
     # ax.contourf(bath_lon.values, bath_lat.values, bath_elev.values, lev, cmap=cmocean.cm.topo)
-    ax.pcolormesh(bath_lon.values, bath_lat.values, bath_elev.values, cmap=cmocean.cm.topo)
+    ax.pcolormesh(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, cmap=cmocean.cm.topo)
 
     coast = cfeature.NaturalEarthFeature('physical', 'coastline', '110m')
     ax.add_feature(coast, edgecolor='black', facecolor='none')
@@ -115,7 +117,9 @@ def main(f, years, savefile):
                 transform=ccrs.PlateCarree())
         # ax.plot(full_track['lon'], full_track['lat'], c='cyan', marker='.', markersize=1, transform=ccrs.PlateCarree())
 
-    plt.savefig(os.path.join(sDir, '{}.png'.format(savefile)), dpi=300)
+    sfile_png = os.path.join(sDir, '{}.png'.format(savefile))
+    plt.savefig(sfile_png, dpi=300)
+    print(sfile_png)
     plt.close()
 
     kml.save(os.path.join(sDir, '{}.kml'.format(savefile)))
