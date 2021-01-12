@@ -101,7 +101,7 @@ def main(f, years, savefile):
         lin = kml.newlinestring(name=stm_name, coords=coords)
 
         # plot full hurricane track
-        ax.plot(full_track['lon'], full_track['lat'], c='red', marker='.', markersize=1, transform=ccrs.PlateCarree())
+        ax.plot(full_track['lon'], full_track['lat'], c='red', lw=.8, transform=ccrs.PlateCarree())
 
     sfile_png = os.path.join(sDir, '{}.png'.format(savefile))
     plt.savefig(sfile_png, dpi=300)
