@@ -38,20 +38,9 @@ def add_map_features(ax, axes_limits=None):
     n = 10
     elev_sub = elev[::n, ::n]
 
-    # lon_lim = [-100.0, -10.0]
-    # lat_lim = [0.0, 60.0]
-    #
-    # oklatbath = np.logical_and(bath_lat >= lat_lim[0], bath_lat <= lat_lim[-1])
-    # oklonbath = np.logical_and(bath_lon >= lon_lim[0], bath_lon <= lon_lim[-1])
-    #
-    # bath_latsub = bath_lat[oklatbath]
-    # bath_lonsub = bath_lon[oklonbath]
-    # bath_elevs = bath_elev[oklatbath, :]
-    # bath_elevsub = bath_elevs[:, oklonbath]
-
     lev = np.arange(-9000, 9100, 100)
-    # ax.contourf(bath_lonsub, bath_latsub, bath_elevsub, lev, cmap=cmocean.cm.topo)
-    ax.contourf(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, lev, cmap=cmocean.cm.topo)
+    ax.contourf(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, lev, cmap=cmocean.cm.topo,
+                transform=ccrs.PlateCarree())
     # ax.pcolormesh(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, cmap=cmocean.cm.topo,
     #               transform=ccrs.PlateCarree())
 
@@ -93,8 +82,6 @@ def main(f, years, savefile):
 
     for i, hi in enumerate(hindex):
         if i == 0:
-            # ax_lims = [-180, 180, 90, -90]
-            # add_map_features(ax, ax_lims)
             add_map_features(ax)
 
         ncf = ncfile.sel(storm=hi)
