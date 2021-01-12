@@ -29,7 +29,7 @@ def add_map_features(ax, axes_limits=None):
         ax.set_extent(axes_limits)
 
     # add bathymetry
-    bath_file = '/home/lgarzio/bathymetry_files/gebco_2020_netcdf/GEBCO_2020.nc'
+    bath_file = '/home/lgarzio/bathymetry_files/gebco_2020_netcdf/GEBCO_2020.nc'  # on server
     #bath_file = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/gebco_2020_netcdf/GEBCO_2020.nc'
     ncbath = xr.open_dataset(bath_file)
     elev = ncbath.elevation
@@ -49,10 +49,11 @@ def add_map_features(ax, axes_limits=None):
     # bath_elevs = bath_elev[oklatbath, :]
     # bath_elevsub = bath_elevs[:, oklonbath]
 
-    # lev = np.arange(-9000, 9100, 100)
+    lev = np.arange(-9000, 9100, 100)
     # ax.contourf(bath_lonsub, bath_latsub, bath_elevsub, lev, cmap=cmocean.cm.topo)
-    # ax.contourf(bath_lon.values, bath_lat.values, bath_elev.values, lev, cmap=cmocean.cm.topo)
-    ax.pcolormesh(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, cmap=cmocean.cm.topo)
+    ax.contourf(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, lev, cmap=cmocean.cm.topo)
+    # ax.pcolormesh(elev_sub.lon.values, elev_sub.lat.values, elev_sub.values, cmap=cmocean.cm.topo,
+    #               transform=ccrs.PlateCarree())
 
     coast = cfeature.NaturalEarthFeature('physical', 'coastline', '110m')
     ax.add_feature(coast, edgecolor='black', facecolor='none')
