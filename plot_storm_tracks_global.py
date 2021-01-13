@@ -75,7 +75,7 @@ def main(f, years, savefile):
 
     #fig, ax = plt.subplots(subplot_kw=dict(projection=ccrs.PlateCarree()))
     fig, ax = plt.subplots(subplot_kw=dict(projection=ccrs.Robinson()))
-    plt.title(ttl)
+    #plt.title(ttl)
     ax.set_global()
 
     kml = simplekml.Kml()
