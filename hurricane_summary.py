@@ -50,12 +50,13 @@ def main(f, years, bsin):
             if bsin in basin_lst:
                 append_data(storm_summary, stm, yrs, i)
     df = pd.DataFrame(storm_summary)
-    df.to_csv(os.path.join(sDir, 'summary_2019_2020.csv'))
+    df.to_csv(os.path.join(sDir, 'summary_1970-2019.csv'), index=False)
 
 
 if __name__ == '__main__':
     # fpath = '/Users/lgarzio/Documents/rucool/hurricanes/congress_brief2020/IBTrACS.NA.v04r00.nc'
-    fpath = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/IBTrACS.last3years.v04r00.nc'
-    yrs = [2019, 2020]  # start and end year
-    basin = 'all'  # 'NA'
+    # fpath = '/Users/lgarzio/Documents/rucool/hurricanes/hurricane_tracks_global_jan2021/IBTrACS.last3years.v04r00.nc'
+    fpath = '/Users/lgarzio/Documents/rucool/hurricanes/storms_1970-2019/IBTrACS.NA.v04r00.nc'
+    yrs = [1970, 2019]  # start and end year
+    basin = 'NA'  # 'NA', 'all'
     main(fpath, yrs, basin)
