@@ -83,14 +83,23 @@ def main(f, years):
         lf = ncf.landfall.values.astype('float')
         lf[lf == -9999] = np.nan  # convert fill values to nan
         minlf = np.nanmin(lf)
+        lf_ind = np.where(lf < 111)[0]
+        lf_lon = lon[lf_ind]
+
+        # choose when landfall is < 60 nmile and the storm is west of 40 degrees W
+        #if np.logical_and(minlf < 111, any(lf_lon < -60)):
+        if np.logical_and(minlf < 111, any(lf_lon < -40)):
+            nsamerica_lf = 'yes'
+        else:
+            nsamerica_lf = 'no'
 
         lw = 1
         bc = 'darkgray'
         alpha = .6
         mk = 'None'
 
-        # count the storms that make landfall each year
-        if np.logical_and(category >= 0, minlf < 111):
+        # count the storms that make landfall west of 40 degrees W each year
+        if np.logical_and(category >= 0, nsamerica_lf == 'yes'):
             t0 = min(t for t in ncf.time.values if t > cftime.DatetimeGregorian(1800, 1, 1, 0, 0, 0, 0))
             storms_all[t0.year] = storms_all[t0.year] + 1
             ax_all.plot(lon, lat, c='r', marker=mk, linewidth=lw, transform=ccrs.PlateCarree())
@@ -104,13 +113,13 @@ def main(f, years):
             ax_all.plot(lon, lat, c=bc, marker=mk, linewidth=lw, alpha=alpha, transform=ccrs.PlateCarree())
             ax_major.plot(lon, lat, c=bc, marker=mk, linewidth=lw, alpha=alpha, transform=ccrs.PlateCarree())
 
-    export_df(storms_all, os.path.join(sDir, 'NA_landfalling_storms_all_1970-2019.csv'))
-    export_df(storms_major, os.path.join(sDir, 'NA_landfalling_storms_major_1970-2019.csv'))
+    # export_df(storms_all, os.path.join(sDir, 'NA_landfalling_storms_all_1970-2019-test.csv'))
+    # export_df(storms_major, os.path.join(sDir, 'NA_landfalling_storms_major_1970-2019-test.csv'))
 
-    fig_all.savefig(os.path.join(sDir, 'NA_storms_all_1970-2019.png'), dpi=300)
+    fig_all.savefig(os.path.join(sDir, 'NA_storms_all_1970-2019-test40deg.png'), dpi=300)
     plt.close(fig_all)
 
-    fig_major.savefig(os.path.join(sDir, 'NA_storms_major_1970-2019.png'), dpi=300)
+    fig_major.savefig(os.path.join(sDir, 'NA_storms_major_1970-2019-test40deg.png'), dpi=300)
     plt.close(fig_major)
 
 
