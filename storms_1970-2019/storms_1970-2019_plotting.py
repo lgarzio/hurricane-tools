@@ -2,9 +2,10 @@
 
 """
 Author: Lori Garzio on 2/17/2021
-Last modified: 2/17/2021
-Create scatter plots for the latitude at landfall for NA storms for 1) all storms, 2) major storms only (lifetime
-category >=3) and 3) minor storms only (lifetime category < 3)
+Last modified: 2/18/2021
+Create scatter plots for the latitude at landfall for NA storms for 1) all storms TS+, 2) all storms based on category
+at landfall, 3) major storms only (lifetime category >=3), 4) major storms only (category at landfall >=3),
+5) minor storms only (lifetime category < 3), and 6) minor storms only (category at landfall >=0 and <3).
 """
 
 import os
@@ -27,24 +28,45 @@ def main(f):
     sDir = os.path.dirname(f)
     sf = pd.read_csv(f)
 
-    # plot all landfall latitudes (TS and higher category)
+    # plot all landfall latitudes (TS and higher category, based on lifetime category)
     year = sf['year']
     lats = sf['landfall_lat']
-    sfile = os.path.join(sDir, 'landfall_lats_all.png')
+    sfile = os.path.join(sDir, 'landfall_lats_all_lifetimecat.png')
     plot_scatter(year, lats, sfile)
 
-    # plot landfall latitudes for major storms only (category >= 3)
+    # plot all landfall latitudes (TS and higher category, based on category at landfall)
+    sf_filt = sf[sf['landfall_cat'] >= 0]
+    year = sf_filt['year']
+    lats = sf_filt['landfall_lat']
+    sfile = os.path.join(sDir, 'landfall_lats_all_landfallcat.png')
+    plot_scatter(year, lats, sfile)
+
+    # plot landfall latitudes for major storms only (lifetime category >= 3)
     sf_filt = sf[sf['max_usa_sshs'] >= 3]
     year = sf_filt['year']
     lats = sf_filt['landfall_lat']
-    sfile = os.path.join(sDir, 'landfall_lats_major.png')
+    sfile = os.path.join(sDir, 'landfall_lats_major_lifetimecat.png')
     plot_scatter(year, lats, sfile)
 
-    # plot landfall latitudes for minor storms only (category < 3)
+    # plot landfall latitudes for major storms only (category at landfall >= 3)
+    sf_filt = sf[sf['landfall_cat'] >= 3]
+    year = sf_filt['year']
+    lats = sf_filt['landfall_lat']
+    sfile = os.path.join(sDir, 'landfall_lats_major_landfallcat.png')
+    plot_scatter(year, lats, sfile)
+
+    # plot landfall latitudes for minor storms only (lifetime category < 3)
     sf_filt = sf[sf['max_usa_sshs'] < 3]
     year = sf_filt['year']
     lats = sf_filt['landfall_lat']
-    sfile = os.path.join(sDir, 'landfall_lats_minor.png')
+    sfile = os.path.join(sDir, 'landfall_lats_minor_lifetimecat.png')
+    plot_scatter(year, lats, sfile)
+
+    # plot landfall latitudes for minor storms only (category at landfall >= 0, < 3)
+    sf_filt = sf[(sf['landfall_cat'] >= 0) & (sf['landfall_cat'] < 3)]
+    year = sf_filt['year']
+    lats = sf_filt['landfall_lat']
+    sfile = os.path.join(sDir, 'landfall_lats_minor_landfallcat.png')
     plot_scatter(year, lats, sfile)
 
 
